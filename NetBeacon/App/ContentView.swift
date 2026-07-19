@@ -1,21 +1,48 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Discovery") {
-                    Label("Bluetooth Scanner", systemImage: "dot.radiowaves.left.and.right")
-                    Label("Network Discovery", systemImage: "network")
-                    Label("AirPlay Devices", systemImage: "airplayvideo")
-                    Label("Cast Services", systemImage: "play.tv")
-                }
+    @State private var viewModel = DiscoveryViewModel()
 
-                Section("Status") {
-                    Text("NetBeacon Foundation Running")
-                }
+    var body: some View {
+        TabView(selection: $viewModel.selectedTab) {
+            NavigationStack {
+                DashboardView(viewModel: viewModel)
             }
-            .navigationTitle("NetBeacon")
+            .tabItem {
+                Label(DiscoveryViewModel.Tab.dashboard.rawValue, systemImage: DiscoveryViewModel.Tab.dashboard.systemImage)
+            }
+            .tag(DiscoveryViewModel.Tab.dashboard)
+
+            NavigationStack {
+                ServiceListView(viewModel: viewModel)
+            }
+            .tabItem {
+                Label(DiscoveryViewModel.Tab.network.rawValue, systemImage: DiscoveryViewModel.Tab.network.systemImage)
+            }
+            .tag(DiscoveryViewModel.Tab.network)
+
+            NavigationStack {
+                BLEDeviceListView(viewModel: viewModel)
+            }
+            .tabItem {
+                Label(DiscoveryViewModel.Tab.bluetooth.rawValue, systemImage: DiscoveryViewModel.Tab.bluetooth.systemImage)
+            }
+            .tag(DiscoveryViewModel.Tab.bluetooth)
+
+            NavigationStack {
+                ServiceListView(viewModel: viewModel, mediaOnly: true)
+            }
+            .tabItem {
+                Label(DiscoveryViewModel.Tab.media.rawValue, systemImage: DiscoveryViewModel.Tab.media.systemImage)
+            }
+            .tag(DiscoveryViewModel.Tab.media)
+        }
+        .onAppear {
+            viewModel.start()
         }
     }
+}
+
+#Preview {
+    ContentView()
 }
